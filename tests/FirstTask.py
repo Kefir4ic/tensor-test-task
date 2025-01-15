@@ -1,5 +1,4 @@
 from BasePage import BasePage
-from selenium.webdriver.common.by import By
 
 
 class FirstTaskConst:
@@ -19,6 +18,7 @@ class FirstTask(BasePage):
     # Класс с действиями для первого задания
 
     def open_saby_url(self):
+        # открытие стартовой страницы
         self.open_url(FirstTaskConst.SABY_URL)
 
     def contacts_button_action(self):
@@ -29,32 +29,25 @@ class FirstTask(BasePage):
 
         contacts_menu = self.find_element_by_css_selector(FirstTaskConst.CONTACTS_MENU)
         return contacts_menu
-        # return contacts_menu.is_displayed()
 
     def open_tensor_url(self):
         # выполнение второго этапа сценария для первого задания (переход на URL tensor.ru и проверка перехода)
         self.open_url(FirstTaskConst.TENSOR_URL)
-        # return self.get_current_url()
 
     def power_in_people_text(self):
         # выполнение третьего этапа сценария для первого задания (поиск текста "СИЛА В ЛЮДЯХ")
         power_in_people_block = self.find_element_by_css_selector(FirstTaskConst.POWER_IN_PEOPLE_BLOCK)
 
-        # МНЕ НЕ НРАВИТСЯ ЭТОТ ЭЛЕМЕНТ С ТОЧКИ ЗРЕНИЯ АРХИТЕКТУРЫ
-        power_in_people_text = power_in_people_block.find_element(By.CSS_SELECTOR, FirstTaskConst.POWER_IN_PEOPLE_TEXT)
-        return power_in_people_text
-        # return power_in_people_text.is_displayed()
+        return self.find_element_by_css_selector_in_element(power_in_people_block, FirstTaskConst.POWER_IN_PEOPLE_TEXT)
 
     def power_in_people_action(self):
         # выполнение четвертого этапа сценария для первого задания (нажатие на кнопку)
         power_in_people_block = self.find_element_by_css_selector(FirstTaskConst.POWER_IN_PEOPLE_BLOCK)
 
-        # МНЕ НЕ НРАВИТСЯ ЭТОТ ЭЛЕМЕНТ С ТОЧКИ ЗРЕНИЯ АРХИТЕКТУРЫ
-        power_in_people_more_button = power_in_people_block.find_element(By.CSS_SELECTOR, FirstTaskConst.POWER_IN_PEOPLE_BUTTON)
+        power_in_people_more_button = self.find_element_by_css_selector_in_element(power_in_people_block,
+                                                                              FirstTaskConst.POWER_IN_PEOPLE_BUTTON)
         power_in_people_more_button.click()
         self.wait_browser(5)
-
-        # return self.get_current_url()
 
     def check_cards_size(self):
         # выполнение пятого этапа сценария для первого задания (сравнение размеров карточек)

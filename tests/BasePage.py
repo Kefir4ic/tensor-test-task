@@ -1,4 +1,3 @@
-from selenium import webdriver
 from selenium.webdriver.common.by import By
 
 
@@ -28,3 +27,11 @@ class BasePage:
     def get_current_url(self):
         # получение текущего URL
         return self.driver.current_url
+
+    def find_element_by_css_selector_in_element(self, element, css_selector):
+        # поиск первого элемента по css-селектору
+        return element.find_element(By.CSS_SELECTOR, css_selector)
+
+    def find_elements_by_css_selector_in_element(self, element, css_selector):
+        # поиск списка элементов по css-селектору
+        return element.find_elements(By.CSS_SELECTOR, css_selector)
