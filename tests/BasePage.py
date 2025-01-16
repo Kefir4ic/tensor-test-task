@@ -5,7 +5,13 @@ class BasePage:
     # класс для взаимодействия с webdriver
 
     def __init__(self, driver):
+        self.base_url = 'https://saby.ru/'
         self.driver = driver
+
+    def open_saby_url(self):
+        # открываем стартовый URL
+        self.driver.get(self.base_url)
+        self.wait_browser(2)
 
     def open_url(self, url):
         # открываем необходимый URL

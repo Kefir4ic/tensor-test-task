@@ -1,50 +1,51 @@
-import os
-import requests
+import time
 from FirstTask import FirstTask
 from SecondTask import SecondTask
+from ThirdTask import ThirdTask
 
-import pytest
-import time
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
+FirstTaskConst = {
+    'tensor_url': 'https://tensor.ru/',
+    'tensor_about_url': 'https://tensor.ru/about',
+}
 
-download_dir = os.getcwd()
+SecondTaskConst = {
+    'current_region': 'г. Москва',
+    'current_phone': '+7 495 532-02-27',
+    'needed_region': 'Камчатский край',
+    'needed_phone': '+7 4152 34-01-08'
+}
 
-
-# проверка файла после скачивания
-def check_file(dirname, filename):
-    filepath = os.path.join(dirname, filename)
-    file_byte_size = os.path.getsize(filepath)
-    file_mb_size = file_byte_size / 1048576
-    print(round(file_mb_size, 2))
-
-
-# скачивание файла по ссылке
-def download_file(download_url):
-    response = requests.get(download_url)
-    response.raise_for_status()
-
-    with open('plagin.exe', 'wb') as file:
-        file.write(response.content)
+ThirdTaskConst = {
+    'filename': 'plugin.exe',
+    'link_text': 'Скачать (Exe 10.42 МБ)',
+    'file_size': 10.42
+}
 
 
 def test_first_task(browser):
     first_task = FirstTask(browser)
 
     first_task.open_saby_url()
-    contacts_menu = first_task.contacts_button_action()
+
+    contacts_button = first_task.get_contacts_button()
+    contacts_button.click()
+    first_task.wait_browser(2)
+
+    contacts_menu = first_task.get_contacts_menu()
     assert contacts_menu.is_displayed()
 
     first_task.open_tensor_url()
-    assert first_task.get_current_url() == "https://tensor.ru/"
+    assert first_task.get_current_url() == FirstTaskConst['tensor_url']
 
-    power_in_people_text = first_task.power_in_people_text()
+    power_in_people_text = first_task.get_power_in_people_text_element()
     assert power_in_people_text.is_displayed()
 
-    first_task.power_in_people_action()
-    assert first_task.get_current_url() == "https://tensor.ru/about"
+    power_in_people_more_button = first_task.get_power_in_people_more_button()
+    power_in_people_more_button.click()
+    first_task.wait_browser(2)
+    assert first_task.get_current_url() == FirstTaskConst['tensor_about_url']
 
-    is_width, is_height = first_task.check_cards_size()
+    is_width, is_height = first_task.is_equals_cards_size()
     assert is_width, is_height
 
 
@@ -52,21 +53,25 @@ def test_second_task(browser):
     second_task = SecondTask(browser)
 
     second_task.open_saby_url()
-    contacts_menu = second_task.contacts_button_action()
+
+    contacts_button = second_task.get_contacts_button()
+    contacts_button.click()
+    second_task.wait_browser(2)
+
+    contacts_menu = second_task.get_contacts_menu()
 
     current_region = second_task.get_current_region(contacts_menu)
     current_phone = second_task.get_current_phone(contacts_menu)
 
-    assert current_region == 'г. Москва'
-    assert current_phone == '+7 495 532-02-27'
+    assert current_region == SecondTaskConst['current_region']
+    assert current_phone == SecondTaskConst['current_phone']
 
     region_button = second_task.get_region_button(contacts_menu)
 
     region_button.click()
     second_task.wait_browser(2)
 
-    regions_panel = second_task.get_regions()
-    needed_region_button = second_task.find_region(regions_panel, 'Камчатский край')
+    needed_region_button = second_task.find_region(SecondTaskConst['needed_region'])
 
     needed_region_button.click()
     time.sleep(1)
@@ -74,47 +79,31 @@ def test_second_task(browser):
     new_region = second_task.get_current_region(contacts_menu)
     new_phone = second_task.get_current_phone(contacts_menu)
 
-    assert new_phone != current_phone
     assert new_region != current_region
+    assert new_region == SecondTaskConst['needed_region']
+    assert new_phone == SecondTaskConst['needed_phone']
 
-# ТРЕТИЙ СЦЕНАРИЙ ПЕРЕРАБОТАТЬ
-# print("-------------")
-# print("НАЧАЛО ТРЕТЬЕГО СЦЕНАРИЯ (ПЕРЕРАБОТАТЬ)")
-# print("-------------")
-#
-# options = Options()
-# options.add_experimental_option("prefs", {
-#   "download.default_directory": fr"{download_dir}",
-#   "download.prompt_for_download": True,
-#   "download.directory_upgrade": True,
-#   "safebrowsing.enabled": True
-# })
-# driver = webdriver.Chrome(options)
-# open_url(driver, "https://saby.ru/")
-# driver.implicitly_wait(2)
-#
-# footer = find_element_by_css_selector(driver, '.sbisru-Footer.sbisru-Footer__scheme--default')
-#
-# footer_helpful_block = find_elements_by_css_selector(footer, '.sbisru-Footer__cell.pb-16.pb-sm-8')[2]
-# helpful_links_list = find_elements_by_css_selector(footer_helpful_block, '.sbisru-Footer__list.sbisru-Footer__items--padding-left.sbisru-Footer__list--hidden')
-# for helpful_links_elements in helpful_links_list:
-#     helpful_links = find_elements_by_css_selector(helpful_links_elements, '.sbisru-Footer__list-item.pb-16')
-#     for helpful_link in helpful_links:
-#         if helpful_link.text == 'Скачать локальные версии':
-#             download_link = find_element_by_css_selector(helpful_link, '.sbisru-Footer__link')
-#             # print(download_link.text, download_link.get_attribute('href'))
-#             click_element(download_link)
-#             driver.implicitly_wait(5)
-#
-#             download_links = find_elements_by_css_selector(driver, '.sbis_ru-DownloadNew-loadLink__link.js-link')
-#             for download_link in download_links:
-#                 # print(download_link.text)
-#                 if download_link.text == 'Скачать (Exe 10.42 МБ)':
-#                     download_file(download_link.get_attribute('href'))
-#                     check_file(download_dir, 'plagin.exe')
-#
-#
-# driver.implicitly_wait(10)
-# time.sleep(5)
-#
-# driver.quit()
+
+def test_third_task(browser):
+    third_task = ThirdTask(browser)
+
+    third_task.open_saby_url()
+
+    download_page_link = third_task.get_download_page_link()
+    download_page_link.click()
+
+    third_task.wait_browser(2)
+
+    download_href = third_task.get_needed_download_button_href(ThirdTaskConst['link_text'])
+
+    third_task.download_file(download_href, ThirdTaskConst['filename'])
+
+    is_file_exist = third_task.is_file_exist(ThirdTaskConst['filename'])
+
+    assert is_file_exist
+
+    file_size = third_task.get_download_file_size(ThirdTaskConst['filename'])
+
+    assert file_size == ThirdTaskConst['file_size']
+
+    third_task.delete_file(ThirdTaskConst['filename'])

@@ -10,48 +10,45 @@ class FirstTaskConst:
     POWER_IN_PEOPLE_BUTTON = '.tensor_ru-link.tensor_ru-Index__link'
     WORK_CARD_IMAGES = '.tensor_ru-About__block3-image-filter'
 
-    SABY_URL = "https://saby.ru/"
     TENSOR_URL = "https://tensor.ru/"
 
 
 class FirstTask(BasePage):
     # Класс с действиями для первого задания
 
-    def open_saby_url(self):
-        # открытие стартовой страницы
-        self.open_url(FirstTaskConst.SABY_URL)
+    def get_contacts_button(self):
+        # поиск кнопки с контактами
+        return self.find_element_by_css_selector(FirstTaskConst.CONTACTS_ELEMENT)
 
-    def contacts_button_action(self):
-        # выполнение первого этапа сценария для первого задания (поиск и нажатия на блок с контактами)
-        contacts_element = self.find_element_by_css_selector(FirstTaskConst.CONTACTS_ELEMENT)
-        contacts_element.click()
-        self.wait_browser(2)
-
-        contacts_menu = self.find_element_by_css_selector(FirstTaskConst.CONTACTS_MENU)
-        return contacts_menu
+    def get_contacts_menu(self):
+        # поиск меню с информацией о контактах
+        return self.find_element_by_css_selector(FirstTaskConst.CONTACTS_MENU)
 
     def open_tensor_url(self):
-        # выполнение второго этапа сценария для первого задания (переход на URL tensor.ru и проверка перехода)
+        # переход на URL tensor.ru
         self.open_url(FirstTaskConst.TENSOR_URL)
 
-    def power_in_people_text(self):
-        # выполнение третьего этапа сценария для первого задания (поиск текста "СИЛА В ЛЮДЯХ")
-        power_in_people_block = self.find_element_by_css_selector(FirstTaskConst.POWER_IN_PEOPLE_BLOCK)
+    def _get_power_in_people_block(self):
+        return self.find_element_by_css_selector(FirstTaskConst.POWER_IN_PEOPLE_BLOCK)
 
+    def get_power_in_people_text_element(self):
+        # поиск элемента с текстом "СИЛА В ЛЮДЯХ"
+        power_in_people_block = self._get_power_in_people_block()
         return self.find_element_by_css_selector_in_element(power_in_people_block, FirstTaskConst.POWER_IN_PEOPLE_TEXT)
 
-    def power_in_people_action(self):
-        # выполнение четвертого этапа сценария для первого задания (нажатие на кнопку)
-        power_in_people_block = self.find_element_by_css_selector(FirstTaskConst.POWER_IN_PEOPLE_BLOCK)
+    def get_power_in_people_more_button(self):
+        # поиск кнопки "ПОДРОБНЕЕ" в блоке "СИЛА В ЛЮДЯХ"
+        power_in_people_block = self._get_power_in_people_block()
+        return self.find_element_by_css_selector_in_element(power_in_people_block,
+                                                            FirstTaskConst.POWER_IN_PEOPLE_BUTTON)
 
-        power_in_people_more_button = self.find_element_by_css_selector_in_element(power_in_people_block,
-                                                                              FirstTaskConst.POWER_IN_PEOPLE_BUTTON)
-        power_in_people_more_button.click()
-        self.wait_browser(5)
+    def _get_work_card_images(self):
+        # получение карточек с фото "РАБОТАЕМ"
+        return self.find_elements_by_css_selector(FirstTaskConst.WORK_CARD_IMAGES)
 
-    def check_cards_size(self):
-        # выполнение пятого этапа сценария для первого задания (сравнение размеров карточек)
-        work_card_images = self.find_elements_by_css_selector(FirstTaskConst.WORK_CARD_IMAGES)
+    def is_equals_cards_size(self):
+        # сравнение размеров карточек
+        work_card_images = self._get_work_card_images()
 
         card_width = []
         card_height = []
@@ -60,5 +57,5 @@ class FirstTask(BasePage):
             card_height.append(work_card_image.rect["height"])
             card_width.append(work_card_image.rect["width"])
 
-        return all(width == card_width[0] for width in card_width),\
+        return all(width == card_width[0] for width in card_width), \
             all(height == card_height[0] for height in card_height)
